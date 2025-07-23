@@ -1,0 +1,6 @@
+【SSH連線】
+ssh -i "pem.pem" ec2-user@ec2-54-150-200-186.ap-northeast-1.compute.amazonaws.com
+
+【利用SSH Tunnel建立通道，將連線本地資料庫改為透過EC2連至RDS】
+### 執行指令後再透過【python test.py】執行程式即可。
+ssh -i "pem.pem" -N -L 3306:badminton-system-instance-1.cxeceakaqbgw.ap-northeast-1.rds.amazonaws.com:3306 ec2-user@ec2-54-150-200-186.ap-northeast-1.compute.amazonaws.com
