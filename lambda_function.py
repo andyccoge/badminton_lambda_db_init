@@ -71,6 +71,7 @@ def lambda_handler(event, context):
                 CREATE TABLE IF NOT EXISTS `{db_name}`.`play_date` (
                     `id` INT NOT NULL AUTO_INCREMENT,
                     `datetime` TIMESTAMP NOT NULL COMMENT '開場日期&時間',
+                    `datetime_e` TIMESTAMP NOT NULL COMMENT '開場日期&時間(結束)',
                     `location` VARCHAR(255) DEFAULT NULL COMMENT '地點',
                     `note` VARCHAR(255) DEFAULT NULL COMMENT '備註',
                     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
