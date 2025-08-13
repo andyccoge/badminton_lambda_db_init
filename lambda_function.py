@@ -64,7 +64,7 @@ def lambda_handler(event, context):
                     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                     PRIMARY KEY (`id`),
-                    UNIQUE KEY `email_cellphone_UNIQUE` (`email`, `cellphone`)
+                    UNIQUE KEY `name_email_cellphone_UNIQUE` (`name`, `email`, `cellphone`)
                 ) COMMENT = '人員(球員)';
             """)
             cursor.execute(f"""
