@@ -89,7 +89,7 @@ def lambda_handler(event, context):
                     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                     PRIMARY KEY (`id`),
-                    CONSTRAINT `fk_relations_play_date`
+                    CONSTRAINT `fk_courts_play_date`
                         FOREIGN KEY (`play_date_id`)
                         REFERENCES `{db_name}`.`play_date` (`id`)
                         ON DELETE NO ACTION
