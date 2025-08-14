@@ -119,7 +119,8 @@ def lambda_handler(event, context):
                         FOREIGN KEY (`play_date_id`)
                         REFERENCES `{db_name}`.`play_date` (`id`)
                         ON DELETE NO ACTION
-                        ON UPDATE NO ACTION
+                        ON UPDATE NO ACTION,
+                    UNIQUE KEY `play_date_id_user_id_UNIQUE` (`play_date_id`, `user_id`)
                 ) COMMENT = '報名紀錄，某人報名了某天打球的紀錄';
             """)
             cursor.execute(f"""
