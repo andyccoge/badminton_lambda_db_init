@@ -1,8 +1,9 @@
+# 8.0.mysql_aurora.3.08.2
 import json
 import boto3
 import pymysql
 import os
-import requests
+# import requests
 
 def get_secret(secret_name, region_name="ap-northeast-1"):
     client = boto3.client('secretsmanager', region_name=region_name)
@@ -126,10 +127,10 @@ def lambda_handler(event, context):
             cursor.execute(f"""
                 CREATE TABLE IF NOT EXISTS `{db_name}`.`matchs` (
                     `id` INT NOT NULL AUTO_INCREMENT,
-                    `user_id_1` INT NOT NULL COMMENT '球員1(對應人員id)',
-                    `user_id_2` INT NOT NULL COMMENT '球員2(對應人員id)',
-                    `user_id_3` INT NOT NULL COMMENT '球員3(對應人員id)',
-                    `user_id_4` INT NOT NULL COMMENT '球員4(對應人員id)',
+                    `user_id_1` INT NULL COMMENT '球員1(對應人員id, NULL 表示空缺)',
+                    `user_id_2` INT NULL COMMENT '球員2(對應人員id, NULL 表示空缺)',
+                    `user_id_3` INT NULL COMMENT '球員3(對應人員id, NULL 表示空缺)',
+                    `user_id_4` INT NULL COMMENT '球員4(對應人員id, NULL 表示空缺)',
                     `play_date_id` INT NOT NULL COMMENT '對應打球日id',
                     `court_id` INT NOT NULL COMMENT '對應場地id',
                     `point_12` INT DEFAULT 0 COMMENT '第一組分數',
@@ -138,41 +139,29 @@ def lambda_handler(event, context):
                     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                     PRIMARY KEY (`id`),
+
+                    -- 索引
                     INDEX `fk_matchs_users_idx_1` (`user_id_1` ASC) VISIBLE,
                     INDEX `fk_matchs_users_idx_2` (`user_id_2` ASC) VISIBLE,
                     INDEX `fk_matchs_users_idx_3` (`user_id_3` ASC) VISIBLE,
                     INDEX `fk_matchs_users_idx_4` (`user_id_4` ASC) VISIBLE,
                     INDEX `fk_matchs_play_date_idx` (`play_date_id` ASC) VISIBLE,
-                    CONSTRAINT `fk_matchs_users_1`
-                        FOREIGN KEY (`user_id_1`)
-                        REFERENCES `{db_name}`.`users` (`id`)
-                        ON DELETE NO ACTION
-                        ON UPDATE NO ACTION,
-                    CONSTRAINT `fk_matchs_users_2`
-                        FOREIGN KEY (`user_id_2`)
-                        REFERENCES `{db_name}`.`users` (`id`)
-                        ON DELETE NO ACTION
-                        ON UPDATE NO ACTION,
-                    CONSTRAINT `fk_matchs_users_3`
-                        FOREIGN KEY (`user_id_3`)
-                        REFERENCES `{db_name}`.`users` (`id`)
-                        ON DELETE NO ACTION
-                        ON UPDATE NO ACTION,
-                    CONSTRAINT `fk_matchs_users_4`
-                        FOREIGN KEY (`user_id_4`)
-                        REFERENCES `{db_name}`.`users` (`id`)
-                        ON DELETE NO ACTION
-                        ON UPDATE NO ACTION,
-                    CONSTRAINT `fk_matchs_play_date`
-                        FOREIGN KEY (`play_date_id`)
-                        REFERENCES `{db_name}`.`play_date` (`id`)
-                        ON DELETE NO ACTION
-                        ON UPDATE NO ACTION,
-                    CONSTRAINT `fk_matchs_courts`
-                        FOREIGN KEY (`court_id`)
-                        REFERENCES `{db_name}`.`courts` (`id`)
-                        ON DELETE NO ACTION
-                        ON UPDATE NO ACTION
+
+                    -- 外鍵
+                    CONSTRAINT `fk_matchs_users_1` FOREIGN KEY (`user_id_1`) REFERENCES `{db_name}`.`users` (`id`),
+                    CONSTRAINT `fk_matchs_users_2` FOREIGN KEY (`user_id_2`) REFERENCES `{db_name}`.`users` (`id`),
+                    CONSTRAINT `fk_matchs_users_3` FOREIGN KEY (`user_id_3`) REFERENCES `{db_name}`.`users` (`id`),
+                    CONSTRAINT `fk_matchs_users_4` FOREIGN KEY (`user_id_4`) REFERENCES `{db_name}`.`users` (`id`),
+                    CONSTRAINT `fk_matchs_play_date` FOREIGN KEY (`play_date_id`) REFERENCES `{db_name}`.`play_date` (`id`),
+                    CONSTRAINT `fk_matchs_courts` FOREIGN KEY (`court_id`) REFERENCES `{db_name}`.`courts` (`id`),
+
+                    -- ✅ 至少一個 user_id 不是 NULL
+                    CONSTRAINT chk_user_ids CHECK (
+                        user_id_1 IS NOT NULL OR 
+                        user_id_2 IS NOT NULL OR 
+                        user_id_3 IS NOT NULL OR 
+                        user_id_4 IS NOT NULL
+                    )
                 ) COMMENT = '比賽紀錄，記錄所有比賽的紀錄，包含4個球員、場地、日期、分數';
             """)
         return {"statusCode": 200, "body": "Tables created successfully"}
